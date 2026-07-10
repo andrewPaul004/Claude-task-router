@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "enabled": true,
+  "installScope": "project",
+  "allowedModels": ["haiku", "sonnet"],
+  "maximumEffort": "medium",
+  "costPreference": "high",
+  "transparencyMode": "compact",
+  "repositoryContext": {
+    "enabled": true,
+    "includeGitDiff": true,
+    "exclude": ["fixtures", "snapshots"]
+  }
+}
