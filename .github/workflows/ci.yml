@@ -1,0 +1,81 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: Lint, format, typecheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run format:check
+      - run: npm run lint
+      - run: npm run typecheck
+
+  test:
+    name: Test (Node ${{ matrix.node }} / ${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        node: [18, 20, 22]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: npm test
+
+  eval:
+    name: Routing evaluation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run eval
+
+  package:
+    name: Package validation + tarball install
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: npm pack --dry-run
+      - name: Install the packed tarball into a clean prefix
+        run: |
+          set -euo pipefail
+          TARBALL="$(npm pack | tail -n1)"
+          TMP="$(mktemp -d)"
+          npm install -g --prefix "$TMP" "./$TARBALL"
+          BIN="$TMP/bin"
+          [ -d "$TMP/lib/node_modules/.bin" ] && BIN="$TMP/lib/node_modules/.bin"
+          export PATH="$BIN:$PATH"
+          echo "--- version ---"; claude-task-router version
+          echo "--- ctr alias ---"; ctr version
+          echo "--- analyze ---"; claude-task-router analyze --json "Fix the login issue" > /dev/null
+          echo "--- doctor ---"; claude-task-router doctor || true

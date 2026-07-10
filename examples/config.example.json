@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "enabled": true,
+  "defaultModel": "sonnet",
+  "fallbackModel": "sonnet",
+  "allowedModels": ["haiku", "sonnet", "opus"],
+  "maximumEffort": "high",
+  "optimizationMode": "auto",
+  "transparencyMode": "compact",
+  "confirmationMode": "high-risk",
+  "costPreference": "medium",
+  "qualityPreference": "medium",
+  "latencyPreference": "medium",
+  "repositoryContext": {
+    "enabled": true,
+    "recentCommits": false
+  },
+  "classifier": {
+    "llmEnabled": false,
+    "model": "haiku"
+  },
+  "privacy": {
+    "redactSecrets": true,
+    "storePrompts": false
+  },
+  "telemetry": {
+    "enabled": false
+  }
+}
